@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Elements
     const promptInput = document.getElementById('prompt');
     const negativePromptInput = document.getElementById('negative-prompt');
-    const styleSelect = document.getElementById('style');
+    const styleInput = document.getElementById('style');
+    const styleSelectorHeader = document.querySelector('.style-selector-header');
+    const styleOptions = document.querySelectorAll('.style-option');
     const creativitySlider = document.getElementById('creativity');
     const creativityValue = document.getElementById('creativity-value');
     const generateBtn = document.getElementById('generate-btn');
@@ -10,6 +11,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const generatedImage = document.getElementById('generated-image');
     const placeholder = document.querySelector('.placeholder');
     const loadingSpinner = document.querySelector('.loading-spinner');
+
+    // Style selector functionality
+    styleSelectorHeader.addEventListener('click', function() {
+        this.classList.toggle('open');
+        document.querySelector('.style-selector-dropdown').classList.toggle('open');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.style-selector')) {
+            styleSelectorHeader.classList.remove('open');
+            document.querySelector('.style-selector-dropdown').classList.remove('open');
+        }
+    });
+
+    // Handle style selection
+    styleOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Update active class
+            styleOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update header text and hidden input
+            const selectedText = this.textContent;
+            const selectedValue = this.getAttribute('data-value');
+            
+            // Update header content
+            styleSelectorHeader.innerHTML = selectedText + '<span class="icon">▼</span>';
+            
+            // Update hidden input value
+            styleInput.value = selectedValue;
+            
+            // Close dropdown
+            document.querySelector('.style-selector-dropdown').classList.remove('open');
+            styleSelectorHeader.classList.remove('open');
+        });
+    });
 
     // Update creativity value display
     creativitySlider.addEventListener('input', function() {
@@ -20,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     generateBtn.addEventListener('click', async function() {
         const prompt = promptInput.value.trim();
         if (!prompt) {
-            alert('Por favor, describe lo que quieres ver');
+            alert('Please describe what you want to see');
             return;
         }
 
@@ -40,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     prompt: prompt,
                     negative_prompt: negativePromptInput.value.trim(),
-                    style: styleSelect.value,
+                    style: styleInput.value,
                     creativity: parseInt(creativitySlider.value)
                 })
             });
@@ -53,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 generatedImage.classList.remove('hidden');
                 downloadBtn.classList.remove('hidden');
             } else {
-                throw new Error(data.error || 'Error al generar la imagen');
+                throw new Error(data.error || 'Error generating image');
             }
         } catch (error) {
             alert('Error: ' + error.message);
@@ -74,16 +112,5 @@ document.addEventListener('DOMContentLoaded', function() {
         link.click();
         document.body.removeChild(link);
     });
+});
 
-    // Add animation to input elements
-    const inputElements = document.querySelectorAll('textarea, select, input');
-    inputElements.forEach(element => {
-        element.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'translateY(-5px)';
-        });
-
-        element.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'translateY(0)';
-        });
-    });
-}); 

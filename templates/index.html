@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,42 +8,59 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div id="p5-background"></div>
     <div class="container">
         <header class="glass-header">
             <div class="logo">
                 <h1>DEEP<span>VISION</span></h1>
-                <p class="subtitle-text">Convierte tus ideas en imágenes con inteligencia artificial</p>
+                <p class="subtitle-text">Transform your ideas into images with artificial intelligence</p>
             </div>
         </header>
 
         <main class="content">
             <div class="input-section">
                 <div class="form-group">
-                    <label for="prompt">Describe lo que quieres ver</label>
-                    <textarea id="prompt" placeholder="Escribe tu descripción aquí..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="negative-prompt">Elementos a evitar</label>
-                    <textarea id="negative-prompt" placeholder="Describe lo que quieres evitar..."></textarea>
+                    <label for="prompt">Describe what you want to see</label>
+                    <textarea id="prompt" placeholder="Write your description here..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="style">Estilo artístico</label>
-                    <select id="style">
-                        <option value="fotorrealista">Fotorrealista</option>
-                        <option value="ilustracion">Ilustración</option>
-                        <option value="pintura-oleo">Pintura al óleo</option>
-                        <option value="acuarela">Acuarela</option>
-                        <option value="pixel-art">Pixel art</option>
-                        <option value="abstracto">Abstracto</option>
-                    </select>
+                    <label for="negative-prompt">Elements to avoid</label>
+                    <textarea id="negative-prompt" placeholder="Describe what you want to avoid..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="creativity">Nivel de creatividad</label>
+                    <label for="style">Art style</label>
+                    <div class="style-selector">
+                        <div class="style-selector-header">
+                            Photorealistic
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="style-selector-dropdown">
+                            <div class="style-option active" data-value="photorealistic">Photorealistic</div>
+                            <div class="style-option" data-value="illustration">Illustration</div>
+                            <div class="style-option" data-value="oil-painting">Oil painting</div>
+                            <div class="style-option" data-value="watercolor">Watercolor</div>
+                            <div class="style-option" data-value="pixel-art">Pixel art</div>
+                            <div class="style-option" data-value="abstract">Abstract</div>
+                            <div class="style-option" data-value="anime">Anime</div>
+                            <div class="style-option" data-value="comic-book">Comic book</div>
+                            <div class="style-option" data-value="minimalist">Minimalist</div>
+                            <div class="style-option" data-value="surrealism">Surrealism</div>
+                            <div class="style-option" data-value="pop-art">Pop art</div>
+                            <div class="style-option" data-value="3d-rendering">3D rendering</div>
+                            <div class="style-option" data-value="cyberpunk">Cyberpunk</div>
+                            <div class="style-option" data-value="fantasy">Fantasy</div>
+                            <div class="style-option" data-value="noir">Noir</div>
+                        </div>
+                        <input type="hidden" id="style" value="photorealistic">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="creativity">Creativity level</label>
                     <div class="slider-container">
                         <input type="range" id="creativity" min="1" max="10" value="5">
                         <span id="creativity-value">5</span>
@@ -50,7 +68,7 @@
                 </div>
 
                 <button id="generate-btn" class="generate-btn">
-                    <span class="btn-text">Generar imagen</span>
+                    <span class="btn-text">Generate image</span>
                     <span class="loading-spinner hidden">
                         <i class="fas fa-spinner fa-spin"></i>
                     </span>
@@ -61,12 +79,12 @@
                 <div class="image-container">
                     <div class="placeholder">
                         <i class="fas fa-image"></i>
-                        <p>Tu imagen aparecerá aquí</p>
+                        <p>Your image will appear here</p>
                     </div>
-                    <img id="generated-image" class="hidden" alt="Imagen generada">
+                    <img id="generated-image" class="hidden" alt="Generated image">
                 </div>
                 <button id="download-btn" class="download-btn hidden">
-                    <i class="fas fa-download"></i> Descargar imagen
+                    <i class="fas fa-download"></i> Download image
                 </button>
             </div>
         </main>
@@ -76,4 +94,5 @@
     <script src="{{ url_for('static', filename='ai-background.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-</html> 
+
+</html>
