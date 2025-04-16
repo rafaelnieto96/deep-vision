@@ -524,6 +524,15 @@ input[type="range"]::-moz-range-thumb {
     visibility: visible;
 }
 
+.form-group:has(label[for="style"]) .style-selector-dropdown.open {
+    max-height: 200px;
+}
+
+.form-group:has(label[for="aspect-ratio"]) .style-selector-dropdown.open {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
 .style-selector-dropdown::-webkit-scrollbar {
     width: 6px;
     background-color: rgba(10, 10, 25, 0.5);
