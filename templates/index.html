@@ -33,7 +33,7 @@
 
                 <div class="form-group">
                     <label for="style">Art style</label>
-                    <div class="style-selector">
+                    <div class="style-selector" id="style-selector">
                         <div class="style-selector-header">
                             Photorealistic
                             <span class="icon">▼</span>
@@ -61,17 +61,17 @@
 
                 <div class="form-group">
                     <label for="aspect-ratio">Aspect ratio</label>
-                    <div class="style-selector">
+                    <div class="style-selector" id="ratio-selector">
                         <div class="style-selector-header" id="ratio-selector-header">
                             1:1 (Square)
                             <span class="icon">▼</span>
                         </div>
                         <div class="style-selector-dropdown">
-                            <div class="style-option active" data-value="1:1">1:1 (Square)</div>
-                            <div class="style-option" data-value="3:4">3:4 (Portrait)</div>
-                            <div class="style-option" data-value="4:3">4:3 (Landscape)</div>
-                            <div class="style-option" data-value="9:16">9:16 (Vertical)</div>
-                            <div class="style-option" data-value="16:9">16:9 (Horizontal)</div>
+                            <div class="ratio-option active" data-value="1:1">1:1 (Square)</div>
+                            <div class="ratio-option" data-value="3:4">3:4 (Portrait)</div>
+                            <div class="ratio-option" data-value="4:3">4:3 (Landscape)</div>
+                            <div class="ratio-option" data-value="9:16">9:16 (Vertical)</div>
+                            <div class="ratio-option" data-value="16:9">16:9 (Horizontal)</div>
                         </div>
                         <input type="hidden" id="aspect-ratio" value="1:1">
                     </div>

@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const promptInput = document.getElementById('prompt');
     const negativePromptInput = document.getElementById('negative-prompt');
     const styleInput = document.getElementById('style');
-    const styleSelectorHeader = document.querySelector('.style-selector-header');
-    const styleOptions = document.querySelectorAll('.style-option');
+    const styleSelectorHeader = document.querySelector('#style-selector .style-selector-header');
+    const styleOptions = document.querySelectorAll('#style-selector .style-option');
     const aspectRatioInput = document.getElementById('aspect-ratio');
     const ratioSelectorHeader = document.getElementById('ratio-selector-header');
-    const ratioOptions = document.querySelectorAll('#ratio-selector-header + .style-selector-dropdown .style-option');
+    const ratioOptions = document.querySelectorAll('#ratio-selector .ratio-option');
     const creativitySlider = document.getElementById('creativity');
     const creativityValue = document.getElementById('creativity-value');
     const generateBtn = document.getElementById('generate-btn');
@@ -89,20 +89,52 @@ document.addEventListener('DOMContentLoaded', function () {
         creativityValue.textContent = this.value;
     });
 
+    // Functions to handle loading state
+    function setLoadingState(isLoading) {
+        generateBtn.disabled = isLoading;
+        if (isLoading) {
+            loadingSpinner.classList.remove('hidden');
+            generateBtn.classList.add('disabled');
+            placeholder.innerHTML = `
+                <i class="fas fa-cog fa-spin"></i>
+                <p>Generating your image, please wait...</p>
+                <p class="small-text">(This may take 5-10 seconds)</p>
+            `;
+            placeholder.classList.add('loading');
+            placeholder.classList.remove('hidden');
+            generatedImage.classList.add('hidden');
+            downloadBtn.classList.add('hidden');
+        } else {
+            loadingSpinner.classList.add('hidden');
+            generateBtn.classList.remove('disabled');
+            placeholder.classList.remove('loading');
+        }
+    }
+
+    function handleError(errorMessage) {
+        console.error("Error:", errorMessage);
+        placeholder.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Error: ${errorMessage}</p>
+            <p class="small-text">Please try again with a different prompt</p>
+        `;
+        placeholder.classList.add('error');
+        placeholder.classList.remove('hidden');
+        generatedImage.classList.add('hidden');
+        downloadBtn.classList.add('hidden');
+        setLoadingState(false);
+    }
+
     // Generate image
     generateBtn.addEventListener('click', async function () {
         const prompt = promptInput.value.trim();
         if (!prompt) {
-            alert('Please describe what you want to see');
+            handleError('Please describe what you want to see');
             return;
         }
 
-        // Show loading state
-        generateBtn.disabled = true;
-        loadingSpinner.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-        generatedImage.classList.add('hidden');
-        downloadBtn.classList.add('hidden');
+        // Set loading state
+        setLoadingState(true);
 
         try {
             const response = await fetch('/generate', {
@@ -122,31 +154,55 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (response.ok) {
-                // Display generated image
+                // Set up image loading handlers
+                generatedImage.onload = function () {
+                    // Imagen cargada correctamente
+                    placeholder.classList.add('hidden');
+                    generatedImage.classList.remove('hidden');
+                    downloadBtn.classList.remove('hidden');
+                    setLoadingState(false);
+
+                    // Ajustar el tamaño según el aspecto de la imagen real
+                    const imgAspect = this.naturalWidth / this.naturalHeight;
+
+                    if (imgAspect < 0.8) { // Imagen vertical
+                        generatedImage.style.maxHeight = "95%";
+                        generatedImage.style.maxWidth = "auto";
+                    } else if (imgAspect > 1.2) { // Imagen horizontal
+                        generatedImage.style.maxWidth = "95%";
+                        generatedImage.style.maxHeight = "auto";
+                    } else { // Imagen cuadrada
+                        generatedImage.style.maxWidth = "95%";
+                        generatedImage.style.maxHeight = "95%";
+                    }
+                };
+
+                generatedImage.onerror = function () {
+                    // Image failed to load
+                    handleError('Could not load the generated image');
+                };
+
+                // Set the image source to trigger loading
                 generatedImage.src = data.image_url;
-                generatedImage.classList.remove('hidden');
-                downloadBtn.classList.remove('hidden');
             } else {
-                throw new Error(data.error || 'Error generating image');
+                throw new Error(data.error || 'Failed to generate image');
             }
         } catch (error) {
-            alert('Error: ' + error.message);
-            placeholder.classList.remove('hidden');
-        } finally {
-            // Reset loading state
-            generateBtn.disabled = false;
-            loadingSpinner.classList.add('hidden');
+            handleError(error.message);
         }
     });
 
     // Download image
     downloadBtn.addEventListener('click', function () {
-        const link = document.createElement('a');
-        link.href = generatedImage.src;
-        link.download = 'deep-vision-generated-image.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        if (generatedImage.complete && generatedImage.naturalHeight !== 0) {
+            const link = document.createElement('a');
+            link.href = generatedImage.src;
+            link.download = 'deep-vision-generated-image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            alert('Please wait for the image to load completely before downloading.');
+        }
     });
 });
-

@@ -123,6 +123,8 @@ body {
     margin-top: 0.5rem;
     flex: 1;
     min-height: 0;
+    overflow: hidden;
+    max-height: calc(100vh - 130px);
 }
 
 .input-section,
@@ -150,6 +152,8 @@ body {
         rgba(16, 24, 48, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-right: 3px solid rgba(12, 133, 169, 0.7);
+    overflow-y: auto;
+    max-height: 100%;
 }
 
 .form-group {
@@ -393,6 +397,7 @@ input[type="range"]::-moz-range-thumb {
     margin-bottom: 1rem;
     overflow: hidden;
     border: 1px solid var(--border-color);
+    position: relative;
 }
 
 .placeholder {
@@ -411,9 +416,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #generated-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .hidden {
@@ -553,7 +560,8 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 3px;
 }
 
-.style-option {
+.style-option,
+.ratio-option {
     padding: 0.8rem 1rem;
     color: var(--text-color);
     cursor: pointer;
@@ -561,19 +569,23 @@ input[type="range"]::-moz-range-thumb {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.style-option:last-child {
+.style-option:last-child,
+.ratio-option:last-child {
     border-bottom: none;
 }
 
-.style-option:hover {
+.style-option:hover,
+.ratio-option:hover {
     background: linear-gradient(to right, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.05), transparent);
 }
 
-.input-section .style-option:hover {
+.input-section .style-option:hover,
+.input-section .ratio-option:hover {
     background: linear-gradient(to right, rgba(169, 39, 85, 0.15), rgba(169, 39, 85, 0.05), transparent);
 }
 
-.style-option.active {
+.style-option.active,
+.ratio-option.active {
     background: linear-gradient(to right, rgba(100, 255, 218, 0.2), transparent);
     color: var(--accent-color);
     border-left: 3px solid var(--accent-color);
@@ -581,7 +593,8 @@ input[type="range"]::-moz-range-thumb {
     font-weight: 500;
 }
 
-.input-section .style-option.active {
+.input-section .style-option.active,
+.input-section .ratio-option.active {
     background: linear-gradient(to right, rgba(169, 39, 85, 0.2), transparent);
     color: var(--accent-color);
     border-left: 3px solid rgba(169, 39, 85, 0.7);
@@ -595,4 +608,72 @@ input[type="range"]::-moz-range-thumb {
 .input-section .style-selector-header.open {
     border-color: rgba(169, 39, 85, 0.7);
     box-shadow: 0 0 10px rgba(169, 39, 85, 0.3);
+}
+
+.placeholder.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--accent-color);
+    animation: pulse 2s infinite;
+}
+
+.placeholder.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--alert-color);
+}
+
+.placeholder .small-text {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+}
+
+.placeholder.loading i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.placeholder.error i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--alert-color);
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+.generate-btn.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.loading-message {
+    color: #666;
+    font-size: 1.1em;
+    margin-top: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
