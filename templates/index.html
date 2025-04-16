@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Vision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="glass-header">
+            <div class="logo">
+                <h1>DEEP<span>VISION</span></h1>
+                <p class="subtitle-text">Convierte tus ideas en imágenes con inteligencia artificial</p>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="prompt">Describe lo que quieres ver</label>
+                    <textarea id="prompt" placeholder="Escribe tu descripción aquí..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="negative-prompt">Elementos a evitar</label>
+                    <textarea id="negative-prompt" placeholder="Describe lo que quieres evitar..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="style">Estilo artístico</label>
+                    <select id="style">
+                        <option value="fotorrealista">Fotorrealista</option>
+                        <option value="ilustracion">Ilustración</option>
+                        <option value="pintura-oleo">Pintura al óleo</option>
+                        <option value="acuarela">Acuarela</option>
+                        <option value="pixel-art">Pixel art</option>
+                        <option value="abstracto">Abstracto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="creativity">Nivel de creatividad</label>
+                    <div class="slider-container">
+                        <input type="range" id="creativity" min="1" max="10" value="5">
+                        <span id="creativity-value">5</span>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="generate-btn">
+                    <span class="btn-text">Generar imagen</span>
+                    <span class="loading-spinner hidden">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+            </div>
+
+            <div class="output-section">
+                <div class="image-container">
+                    <div class="placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Tu imagen aparecerá aquí</p>
+                    </div>
+                    <img id="generated-image" class="hidden" alt="Imagen generada">
+                </div>
+                <button id="download-btn" class="download-btn hidden">
+                    <i class="fas fa-download"></i> Descargar imagen
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="{{ url_for('static', filename='ai-background.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
