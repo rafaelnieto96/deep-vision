@@ -58,19 +58,21 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
-    padding: 2rem;
+    padding: 1.5rem 2rem 1.5rem 2rem;
     height: 100vh;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .glass-header {
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
     text-align: center;
-    padding: 1.5rem;
+    padding: 1.2rem;
     background:
         linear-gradient(to right, rgba(169, 39, 85, 0.4) 0%, rgba(60, 40, 80, 0.3) 50%, rgba(12, 133, 169, 0.4) 100%),
         rgba(16, 24, 48, 0.6);
@@ -93,10 +95,10 @@ body {
 
 .logo h1 {
     font-family: var(--heading-font);
-    font-size: 4rem;
+    font-size: 3.8rem;
     font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     letter-spacing: 2px;
     text-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
 }
@@ -108,7 +110,7 @@ body {
 
 .subtitle-text {
     font-family: var(--body-font);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     opacity: 0.9;
     font-weight: 300;
     color: var(--placeholder-color);
@@ -117,8 +119,10 @@ body {
 .content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+    flex: 1;
+    min-height: 0;
 }
 
 .input-section,
@@ -128,6 +132,8 @@ body {
     border-radius: 18px;
     padding: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
 }
 
 .input-section {
@@ -147,7 +153,7 @@ body {
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 label {
@@ -179,8 +185,8 @@ select::placeholder {
 }
 
 textarea {
-    min-height: 100px;
-    max-height: 100px;
+    min-height: 110px;
+    max-height: 110px;
     resize: none;
     overflow-y: auto;
 }
@@ -346,7 +352,7 @@ input[type="range"]::-moz-range-thumb {
     border: none;
     border-radius: 8px;
     color: #0A192F;
-    font-family: var(--heading-font);
+    font-family: var(--body-font);
     font-size: 1.1rem;
     font-weight: bold;
     letter-spacing: 0.5px;
@@ -357,6 +363,7 @@ input[type="range"]::-moz-range-thumb {
     justify-content: center;
     gap: 0.5rem;
     text-shadow: none;
+    margin-top: auto;
 }
 
 .generate-btn:hover,

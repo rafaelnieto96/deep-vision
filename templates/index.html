@@ -60,6 +60,24 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="aspect-ratio">Aspect ratio</label>
+                    <div class="style-selector">
+                        <div class="style-selector-header" id="ratio-selector-header">
+                            1:1 (Square)
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="style-selector-dropdown">
+                            <div class="style-option active" data-value="1:1">1:1 (Square)</div>
+                            <div class="style-option" data-value="3:4">3:4 (Portrait)</div>
+                            <div class="style-option" data-value="4:3">4:3 (Landscape)</div>
+                            <div class="style-option" data-value="9:16">9:16 (Vertical)</div>
+                            <div class="style-option" data-value="16:9">16:9 (Horizontal)</div>
+                        </div>
+                        <input type="hidden" id="aspect-ratio" value="1:1">
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="creativity">Creativity level</label>
                     <div class="slider-container">
                         <input type="range" id="creativity" min="1" max="10" value="5">
