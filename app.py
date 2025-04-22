@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request, jsonify, send_file
 import os
 import base64
-import io
 import traceback
-from PIL import Image
+from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -19,6 +17,8 @@ if not GOOGLE_API_KEY:
     print("ERROR: Missing GOOGLE_API_KEY environment variable")
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
+
+MODEL_NAME = "models/imagen-3.0-generate-002"
 
 # Validate settings
 VALID_STYLES = [
@@ -67,89 +67,57 @@ def generate_image():
             print(f"WARNING: Invalid creativity value '{creativity}', defaulting to 5")
             creativity = 5
             
-        # Convert creativity (1-10) to temperature (0.0-1.0)
-        temperature = (creativity - 1) / 9  # Maps 1->0.0, 10->1.0
-            
         # Debug prints for parameters
         print(f"DEBUG - Prompt: {prompt}")
         print(f"DEBUG - Negative prompt: {negative_prompt}")
         print(f"DEBUG - Style: {style}")
         print(f"DEBUG - Aspect ratio: {aspect_ratio}")
-        print(f"DEBUG - Creativity: {creativity} (Temperature: {temperature:.2f})")
+        print(f"DEBUG - Creativity: {creativity}")
+        print(f"DEBUG - Using model: {MODEL_NAME}")
 
-        # Construct the prompt with style
+        # Construct the image prompt
+        # Imagen only works with English, so we might need to translate non-English prompts
+        # For this example, I'll keep the prompt as is
         full_prompt = f"{prompt} in {style} style"
         if negative_prompt:
             full_prompt += f". Avoid: {negative_prompt}"
             
-        print(f"DEBUG - Full prompt being sent to Gemini: {full_prompt}")
+        print(f"DEBUG - Full prompt being sent to Imagen: {full_prompt}")
 
         try:
-            # Set up image generation config with aspect ratio parameter
-            image_generation_config = {
-                "aspectRatio": aspect_ratio  # Use the exact parameter name from the API
-            }
-            
-            generation_config = types.GenerateContentConfig(
-                response_modalities=['TEXT', 'IMAGE'],
-                temperature=temperature,
-                image_generation_config=image_generation_config
+            # Configuración correcta para Imagen
+            imagen_config = types.GenerateImagesConfig(
+                number_of_images=1,
+                aspectRatio=aspect_ratio
             )
             
-            # Generate image with the aspect ratio parameter
-            response = client.models.generate_content(
-                model="gemini-2.0-flash-exp-image-generation",
-                contents=full_prompt,
-                config=generation_config
+            # Método correcto con el modelo correcto
+            imagen_response = client.models.generate_images(
+                model=MODEL_NAME,
+                prompt=full_prompt,
+                config=imagen_config
             )
             
-            # Process the response to extract the image
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, 'text') and part.text:
-                    print(f"DEBUG - Generated caption: {part.text}")
-                if hasattr(part, 'inline_data') and part.inline_data:
-                    mime_type = part.inline_data.mime_type
-                    image_data = part.inline_data.data
-                    img_str = base64.b64encode(image_data).decode('utf-8')
-                    print(f"DEBUG - Successfully generated image with aspect ratio: {aspect_ratio}")
-                    return jsonify({'image_url': f"data:{mime_type};base64,{img_str}"})
+            # Procesar la respuesta de Imagen
+            if imagen_response.generated_images:
+                image_data = imagen_response.generated_images[0].image.image_bytes
+                img_str = base64.b64encode(image_data).decode('utf-8')
+                print(f"DEBUG - Successfully generated image with Imagen")
+                return jsonify({'image_url': f"data:image/png;base64,{img_str}"})
             
-            print("DEBUG - No image data found in the response")
+            print("DEBUG - Imagen model didn't return any images")
             return jsonify({'error': 'Failed to generate image: No image data was returned'}), 500
-        
-        except Exception as model_error:
-            print(f"ERROR: Model generation failed: {str(model_error)}")
-            traceback.print_exc()
             
-            # Fallback method if parameter approach fails
-            try:
-                print("DEBUG - Falling back to including aspect ratio in prompt")
-                fallback_prompt = f"{full_prompt} with {aspect_ratio} aspect ratio"
-                
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-exp-image-generation",
-                    contents=fallback_prompt,
-                    config=types.GenerateContentConfig(
-                        response_modalities=['TEXT', 'IMAGE'],
-                        temperature=temperature
-                    )
-                )
-                
-                for part in response.candidates[0].content.parts:
-                    if hasattr(part, 'inline_data') and part.inline_data:
-                        mime_type = part.inline_data.mime_type
-                        image_data = part.inline_data.data
-                        img_str = base64.b64encode(image_data).decode('utf-8')
-                        print(f"DEBUG - Successfully generated image using fallback method")
-                        return jsonify({'image_url': f"data:{mime_type};base64,{img_str}"})
-                
-                return jsonify({'error': 'Failed to generate image with fallback method'}), 500
-                
-            except Exception as fallback_error:
-                print(f"ERROR: Fallback generation failed: {str(fallback_error)}")
-                if 'quota' in str(model_error).lower() or 'quota' in str(fallback_error).lower():
-                    return jsonify({'error': 'API quota exceeded. Please try again later.'}), 429
-                return jsonify({'error': f'Image generation failed: {str(model_error)}'}), 500
+        except Exception as model_error:
+            print(f"ERROR: Image generation failed: {str(model_error)}")
+            error_message = str(model_error)
+            
+            if 'not available in your country' in error_message.lower():
+                return jsonify({'error': 'Image generation is not available in your region. This is a Google API restriction.'}), 400
+            elif 'quota' in error_message.lower():
+                return jsonify({'error': 'API quota exceeded. Please try again later.'}), 429
+            else:
+                return jsonify({'error': f'Image generation failed: {error_message}'}), 500
 
     except Exception as e:
         print(f"ERROR: {str(e)}")
