@@ -1,6 +1,7 @@
 import os
 import base64
 import traceback
+import logging
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from google import genai
@@ -10,6 +11,10 @@ from google.genai import types
 load_dotenv()
 
 app = Flask(__name__)
+
+# Configure logging más simple
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Configure Gemini API
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
@@ -37,7 +42,7 @@ def generate_image():
         # Get and validate request data
         data = request.json
         if not data:
-            return jsonify({'error': 'Invalid request: No JSON data provided'}), 400
+            return jsonify({'error': 'Please provide a valid description'}), 400
 
         prompt = data.get('prompt', '').strip()
         negative_prompt = data.get('negative_prompt', '').strip()
@@ -47,7 +52,7 @@ def generate_image():
 
         # Validate input values
         if not prompt:
-            return jsonify({'error': 'Prompt cannot be empty'}), 400
+            return jsonify({'error': 'Please describe what you want to see'}), 400
 
         if style not in VALID_STYLES:
             style = 'photorealistic'
@@ -67,37 +72,34 @@ def generate_image():
         if negative_prompt:
             full_prompt += f". Avoid: {negative_prompt}"
 
-        try:
-            # Simplified Gemini API call (without problematic generation_config)
-            response = client.models.generate_content(
-                model=MODEL_NAME,
-                contents=full_prompt,
-                config=types.GenerateContentConfig(
-                    response_modalities=["Text", "Image"]
-                ),
-            )
-            
-            # Process response from Gemini
-            if response.parts:
-                for part in response.parts:
-                    if hasattr(part, 'image') and part.image:
-                        image_data = part.image.data
-                        img_str = base64.b64encode(image_data).decode('utf-8')
-                        return jsonify({'image_url': f"data:image/png;base64,{img_str}"})
-                
-                # Return raw response structure when no image is found
-                return jsonify({'error': f'No image in response: {str(response)}'}), 500
-            else:
-                # Return raw response structure
-                return jsonify({'error': f'Empty response: {str(response)}'}), 500
-            
-        except Exception as model_error:
-            # Return the raw API error without custom formatting
-            return jsonify({'error': str(model_error)}), 500
+        # Generate image with Gemini API
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=full_prompt,
+            config=types.GenerateContentConfig(
+                response_modalities=["Text", "Image"]
+            ),
+        )
+        
+        # Process response from Gemini - ESTRUCTURA CORRECTA
+        if hasattr(response, 'candidates') and response.candidates:
+            candidate = response.candidates[0]
+            if hasattr(candidate, 'content') and candidate.content:
+                if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                    for part in candidate.content.parts:
+                        if hasattr(part, 'inline_data') and part.inline_data:
+                            image_data = part.inline_data.data
+                            img_str = base64.b64encode(image_data).decode('utf-8')
+                            logger.info("Image generated successfully")
+                            return jsonify({'image_url': f"data:image/png;base64,{img_str}"})
+        
+        # If we reach here, no image was generated
+        logger.error("No image found in API response structure")
+        return jsonify({'error': 'Unable to generate image. Please try again with a different description'}), 500
 
     except Exception as e:
-        # Only return the raw exception for other errors
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Image generation failed: {str(e)}")
+        return jsonify({'error': 'Unable to generate image at this time. Please try again later'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

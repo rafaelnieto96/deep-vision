@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
         placeholder.innerHTML = `
             <i class="fas fa-exclamation-triangle"></i>
             <p>Error: ${errorMessage}</p>
-            <p class="small-text">Please try again with a different prompt</p>
         `;
         placeholder.classList.add('error');
         placeholder.classList.remove('hidden');
